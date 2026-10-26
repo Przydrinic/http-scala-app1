@@ -12,17 +12,14 @@ import org.przydrinic.domain.MyDomainModel
 
 object ExternalApiClientSuite extends SimpleIOSuite {
 
-  // 1. Define the mock external API response
   val mockExternalApi = HttpApp[IO] {
     case GET -> Root / "data" => Ok(MyDomainModel("success_value"))
     case _                    => NotFound()
   }
 
-  // 2. Convert the mock API directly into an http4s Client
   val mockClient = Client.fromHttpApp(mockExternalApi)
 
   test("fetchExternalData executes request and decodes JSON correctly") {
-    // 3. Inject the mock client into your wrapper
     val apiClient = ExternalApiClient.make[IO](mockClient, uri"http://localhost")
 
     apiClient.fetchExternalData.map { response =>

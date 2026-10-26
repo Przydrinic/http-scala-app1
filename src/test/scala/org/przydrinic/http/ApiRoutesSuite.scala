@@ -12,7 +12,7 @@ import org.przydrinic.http.ApiRoutes
 
 object ApiRoutesSuite extends SimpleIOSuite {
 
-  // 1. Create stubs for happy and failure scenarios
+
   val mockSuccessClient: ExternalApiClient[IO] = new ExternalApiClient[IO] {
     override def fetchExternalData: IO[MyDomainModel] =
       IO.pure(MyDomainModel("test_payload"))
@@ -23,7 +23,7 @@ object ApiRoutesSuite extends SimpleIOSuite {
       IO.raiseError(new RuntimeException("Upstream service down"))
   }
 
-  // 2. Test successful route execution
+
   test("GET /api/info returns 200 OK with decoded payload") {
     val routes  = new ApiRoutes[IO](mockSuccessClient).routes
     val request = Request[IO](Method.GET, uri"/api/info")
@@ -37,7 +37,6 @@ object ApiRoutesSuite extends SimpleIOSuite {
     }
   }
 
-  // 3. Test error handling
   test("GET /api/info handles upstream failures with 500 InternalServerError") {
     val routes  = new ApiRoutes[IO](mockFailureClient).routes
     val request = Request[IO](Method.GET, uri"/api/info")
@@ -49,7 +48,6 @@ object ApiRoutesSuite extends SimpleIOSuite {
     }
   }
 
-  // 4. Test missing routes
   test("GET /invalid returns 404 Not Found") {
     val routes  = new ApiRoutes[IO](mockSuccessClient).routes
     val request = Request[IO](Method.GET, uri"/invalid")
