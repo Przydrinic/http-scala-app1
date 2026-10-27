@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+
+      OTEL_SERVICE_NAME: http-scala-app
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+      OTEL_METRICS_EXPORTER: none
+
+      API_HOST: "http://mock-api:8081"
+    depends_on:
+      - mock-api
+      - jaeger
+
+  mock-api:
+    image: hashicorp/http-echo:latest
+    ports:
+      - "8081:8081"
+    command: ["-text", "{\"value\":\"success_value\"}", "-listen", ":8081"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  jaeger:
+
+    image: jaegertracing/jaeger:latest
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_CONTENT_SECURITY_POLICY: "true"

@@ -1,5 +1,5 @@
 package org.przydrinic.http
-
+// (Imports remain the same)
 import weaver._
 import cats.effect.IO
 import org.http4s._
@@ -8,24 +8,23 @@ import org.http4s.syntax.all._
 import org.http4s.circe.CirceEntityCodec._
 import org.przydrinic.clients.ExternalApiClient
 import org.przydrinic.domain.MyDomainModel
-import org.przydrinic.http.ApiRoutes
+import org.przydrinic.services.AppService // NEW
 
 object ApiRoutesSuite extends SimpleIOSuite {
 
-
   val mockSuccessClient: ExternalApiClient[IO] = new ExternalApiClient[IO] {
-    override def fetchExternalData: IO[MyDomainModel] =
-      IO.pure(MyDomainModel("test_payload"))
+    override def fetchExternalData: IO[MyDomainModel] = IO.pure(MyDomainModel("test_payload"))
   }
 
   val mockFailureClient: ExternalApiClient[IO] = new ExternalApiClient[IO] {
-    override def fetchExternalData: IO[MyDomainModel] =
-      IO.raiseError(new RuntimeException("Upstream service down"))
+    override def fetchExternalData: IO[MyDomainModel] = IO.raiseError(new RuntimeException("Upstream service down"))
   }
 
+  // --- NEW: Instantiate a dummy app service for the tests ---
+  val mockAppService = new AppService[IO]
 
   test("GET /api/info returns 200 OK with decoded payload") {
-    val routes  = new ApiRoutes[IO](mockSuccessClient).routes
+    val routes  = new ApiRoutes[IO](mockSuccessClient, mockAppService).routes // Pass it here
     val request = Request[IO](Method.GET, uri"/api/info")
 
     for {
@@ -38,7 +37,7 @@ object ApiRoutesSuite extends SimpleIOSuite {
   }
 
   test("GET /api/info handles upstream failures with 500 InternalServerError") {
-    val routes  = new ApiRoutes[IO](mockFailureClient).routes
+    val routes  = new ApiRoutes[IO](mockFailureClient, mockAppService).routes
     val request = Request[IO](Method.GET, uri"/api/info")
 
     for {
@@ -49,7 +48,7 @@ object ApiRoutesSuite extends SimpleIOSuite {
   }
 
   test("GET /invalid returns 404 Not Found") {
-    val routes  = new ApiRoutes[IO](mockSuccessClient).routes
+    val routes  = new ApiRoutes[IO](mockSuccessClient, mockAppService).routes
     val request = Request[IO](Method.GET, uri"/invalid")
 
     for {
