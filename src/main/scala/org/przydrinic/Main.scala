@@ -14,7 +14,7 @@ import org.przydrinic.config.AppConfig
 import org.przydrinic.http.ApiRoutes
 import org.przydrinic.services.AppService
 
-// --- NEW: Imports for Logging and Metrics ---
+
 import org.typelevel.log4cats.Logger
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import io.prometheus.client.CollectorRegistry
@@ -36,7 +36,7 @@ object Main extends IOApp.Simple {
 
 
     registry <- Resource.eval(IO(new CollectorRegistry()))
-    _        <- Resource.eval(IO(DefaultExports.initialize())) // CPU, Memory, Threads
+    _        <- Resource.eval(IO(DefaultExports.initialize()))
     metrics  <- Prometheus.metricsOps[IO](registry, "http4s_server")
 
     httpClient <- EmberClientBuilder.default[IO].build

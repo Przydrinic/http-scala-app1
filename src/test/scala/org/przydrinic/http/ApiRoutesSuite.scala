@@ -1,5 +1,5 @@
 package org.przydrinic.http
-// (Imports remain the same)
+
 import weaver._
 import cats.effect.IO
 import org.http4s._
@@ -8,7 +8,7 @@ import org.http4s.syntax.all._
 import org.http4s.circe.CirceEntityCodec._
 import org.przydrinic.clients.ExternalApiClient
 import org.przydrinic.domain.MyDomainModel
-import org.przydrinic.services.AppService // NEW
+import org.przydrinic.services.AppService
 
 object ApiRoutesSuite extends SimpleIOSuite {
 
@@ -20,7 +20,6 @@ object ApiRoutesSuite extends SimpleIOSuite {
     override def fetchExternalData: IO[MyDomainModel] = IO.raiseError(new RuntimeException("Upstream service down"))
   }
 
-  // --- NEW: Instantiate a dummy app service for the tests ---
   val mockAppService = new AppService[IO]
 
   test("GET /api/info returns 200 OK with decoded payload") {
