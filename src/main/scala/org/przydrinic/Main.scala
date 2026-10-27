@@ -9,7 +9,7 @@ import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Server
 import org.http4s.HttpRoutes
 import org.http4s.dsl.io._
-import org.przydrinic.clients.ExternalApiClient
+import org.przydrinic.clients.GeolocationApiClient
 import org.przydrinic.config.AppConfig
 import org.przydrinic.http.ApiRoutes
 import org.przydrinic.services.AppService
@@ -43,7 +43,7 @@ object Main extends IOApp.Simple {
 
 
     appService     = new AppService[IO]
-    externalClient = ExternalApiClient.make[IO](httpClient, baseUri)
+    externalClient = GeolocationApiClient.make[IO](httpClient, baseUri)
     apiRoutes      = new ApiRoutes[IO](externalClient, appService).routes
 
 
