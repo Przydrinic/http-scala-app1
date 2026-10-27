@@ -12,16 +12,11 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
       OTEL_METRICS_EXPORTER: none
 
-      API_HOST: "http://mock-api:8081"
+      API_HOST: "https://api.country.is/"
     depends_on:
-      - mock-api
       - jaeger
 
-  mock-api:
-    image: hashicorp/http-echo:latest
-    ports:
-      - "8081:8081"
-    command: ["-text", "{\"value\":\"success_value\"}", "-listen", ":8081"]
+
 
   prometheus:
     image: prom/prometheus:latest
